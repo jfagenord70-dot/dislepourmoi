@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -10,51 +9,40 @@ const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middlewares
-app.use(cors());
+// Middleware
 app.use(express.json());
-
-// Servir le frontend statique
 app.use(express.static(__dirname));
 
-/* =========================
-   ROUTES API
-========================= */
+// ===== ROUTES API =====
 
-// ✅ TEST API
+// Test API
 app.get("/api/test", (req, res) => {
   res.json({
     status: "ok",
-    message: "API connected successfully"
+    message: "API connected successfully",
   });
 });
 
-// ✅ CHAT API (CELLE QUI MANQUAIT)
+// Chat API (CE QUE LE BOUTON UTILISE)
 app.post("/api/chat", (req, res) => {
   const { message } = req.body;
 
-  if (!message || message.trim() === "") {
-    return res.status(400).json({
-      error: "Message vide"
-    });
+  if (!message) {
+    return res.status(400).json({ error: "Message manquant" });
   }
 
-  // Réponse coach strict (simple pour l’instant)
   res.json({
-    reply: "Identifie une erreur et corrige-la aujourd’hui."
+    reply: `Message reçu : ${message}`,
   });
 });
 
-/* =========================
-   FALLBACK FRONTEND
-========================= */
-
-// Si aucune route API ne matche → frontend
+// ===== FRONTEND =====
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Lancer le serveur
+// Start server
 app.listen(PORT, () => {
-  console.log("SERVER OK on port", PORT);
+  console.log(`SERVER OK on port ${PORT}`);
 });
+
