@@ -1,16 +1,27 @@
-const express = require("express");
-const path = require("path");
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// =========================
-// MIDDLEWARE
-// =========================
+// Pour __dirname avec ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Middlewares
+app.use(cors());
 app.use(express.json());
 
-// =========================
-// API TEST (VALIDÉ)
-// =========================
+// Servir le frontend statique
+app.use(express.static(__dirname));
+
+/* =========================
+   ROUTES API
+========================= */
+
+// ✅ TEST API
 app.get("/api/test", (req, res) => {
   res.json({
     status: "ok",
@@ -18,45 +29,32 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-// =========================
-// CHAT API (1 PHRASE MAX)
-// =========================
+// ✅ CHAT API (CELLE QUI MANQUAIT)
 app.post("/api/chat", (req, res) => {
-  const message = String(req.body.message || "").toLowerCase();
-  let reply = "Avance maintenant.";
+  const { message } = req.body;
 
-  if (message.includes("rate")) {
-    reply = "Identifie une erreur et corrige-la aujourd hui.";
-  } else if (message.includes("fatigu")) {
-    reply = "Prends dix minutes de pause puis reprends une tache simple.";
-  } else if (message.includes("aide")) {
-    reply = "Choisis une action precise et fais-la maintenant.";
-  } else if (message.includes("peur") || message.includes("stress")) {
-    reply = "Respire, decide et passe a l action.";
+  if (!message || message.trim() === "") {
+    return res.status(400).json({
+      error: "Message vide"
+    });
   }
 
-  // GARANTIE : UNE SEULE PHRASE
-  reply = reply.split(".")[0] + ".";
-  res.json({ reply });
+  // Réponse coach strict (simple pour l’instant)
+  res.json({
+    reply: "Identifie une erreur et corrige-la aujourd’hui."
+  });
 });
 
-// =========================
-// STATIC FILES (ROOT)
-// =========================
-app.use(express.static(__dirname));
+/* =========================
+   FALLBACK FRONTEND
+========================= */
 
-// =========================
-// FRONTEND FALLBACK
-// =========================
-app.get("/", (req, res) => {
+// Si aucune route API ne matche → frontend
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// =========================
-// SERVER
-// =========================
-const PORT = process.env.PORT || 3000;
-
+// Lancer le serveur
 app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+  console.log("SERVER OK on port", PORT);
 });
