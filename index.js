@@ -1,16 +1,15 @@
-
 const express = require("express");
 const path = require("path");
 
 const app = express();
 
 // =========================
-// MIDDLEWARES
+// MIDDLEWARE
 // =========================
 app.use(express.json());
 
 // =========================
-// ROUTES API
+// API ROUTES (AVANT TOUT)
 // =========================
 app.get("/api/test", (req, res) => {
   res.json({
@@ -20,12 +19,22 @@ app.get("/api/test", (req, res) => {
 });
 
 // =========================
-// FRONTEND (STATIC FILES)
+// STATIC FILES (ROOT)
 // =========================
-app.use(express.static(path.join(__dirname, "frontend")));
+app.use(express.static(__dirname));
 
 // =========================
-// FALLBACK (SPA support)
+// FALLBACK
 // =========================
-app.get("*", (req, res) => {
-  res.sen
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// =========================
+// SERVER
+// =========================
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
+});
