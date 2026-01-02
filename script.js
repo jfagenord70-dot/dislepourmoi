@@ -1,42 +1,41 @@
-const chatBox = document.getElementById("chatBox");
-const input = document.getElementById("messageInput");
-const btn = document.getElementById("sendBtn");
+const input = document.querySelector("input");
+const button = document.querySelector("button");
+const messages = document.querySelector(".messages");
 
-function addBubble(text, type) {
-  const div = document.createElement("div");
-  div.className = `bubble ${type}`;
-  div.textContent = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-btn.addEventListener("click", sendMessage);
-
-input.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") sendMessage();
-});
-
-async function sendMessage() {
+button.addEventListener("click", async () => {
   const message = input.value.trim();
   if (!message) return;
 
-  addBubble(message, "user");
+  // Message utilisateur
+  const userMsg = document.createElement("div");
+  userMsg.className = "user";
+  userMsg.textContent = message;
+  messages.appendChild(userMsg);
+
   input.value = "";
 
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ message })
     });
 
     const data = await res.json();
-    addBubble(data.reply, "bot");
+
+    // Réponse serveur
+    const botMsg = document.createElement("div");
+    botMsg.className = "bot";
+    botMsg.textContent = data.reply;
+    messages.appendChild(botMsg);
 
   } catch (err) {
-    addBubble("Erreur serveur", "bot");
+    alert("Erreur serveur");
+    console.error(err);
   }
-}
+});
 
 
 
