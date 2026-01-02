@@ -1,31 +1,53 @@
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middlewares
+app.use(express.json());
+app.use(express.static(__dirname));
+
+// ✅ TEST API
+app.get("/api/test", (req, res) => {
+  res.json({
+    status: "ok",
+    message: "API connected successfully",
+  });
+});
+
+// ✅ CHAT API (SMART REPLIES)
 app.post("/api/chat", (req, res) => {
   const { message } = req.body;
 
   if (!message) {
-    return res.status(400).json({ reply: "Message manquant." });
+    return res.status(400).json({ error: "Message manquant" });
   }
 
-  const msg = message.toLowerCase();
-  let reply = "";
+  let reply = "Message reçu : " + message;
 
-  if (msg.includes("salut") || msg.includes("bonjour") || msg.includes("yo")) {
+  const msg = message.toLowerCase();
+
+  if (msg.includes("salut") || msg.includes("bonjour")) {
     reply = "Salut 👋 comment je peux t’aider ?";
-  } 
-  else if (msg.includes("comment") && msg.includes("va")) {
+  } else if (msg.includes("comment ça va")) {
     reply = "Ça va très bien 💪 et toi ?";
-  } 
-  else if (msg.includes("aide")) {
-    reply = "Dis-moi ce dont tu as besoin, je suis là.";
-  } 
-  else if (msg.includes("merci")) {
+  } else if (msg.includes("merci")) {
     reply = "Avec plaisir 😊";
-  } 
-  else if (msg.includes("fatigu")) {
-    reply = "Repose-toi un peu, tu l’as mérité.";
-  } 
-  else {
-    reply = "Je t’ai lu. Dis-m’en plus 👀";
   }
 
   res.json({ reply });
+});
+
+// Frontend fallback
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.listen(PORT, () => {
+  console.log("SERVER OK on port", PORT);
 });
