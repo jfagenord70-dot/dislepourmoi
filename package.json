@@ -1,0 +1,16 @@
+{
+  "name": "dislepourmoi-backend",
+  "version": "1.0.0",
+  "description": "Backend Dislepourmoi",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^17.2.3",
+    "openai": "^4.104.0"
+  }
+}
+
+
