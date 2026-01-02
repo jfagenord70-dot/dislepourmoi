@@ -14,9 +14,10 @@ app.use(express.json());
 app.get("/api/test", (req, res) => {
   res.json({
     status: "ok",
-    message: "API connected successfully"
+    message: "API TEST RENDER V2"
   });
 });
+
 
 // =========================
 // STATIC FILES (ROOT)
