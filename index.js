@@ -1,21 +1,20 @@
+
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
-// Pour __dirname avec ES modules
+// Fix __dirname (Render / ES modules)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
+// Middlewares
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// ===== ROUTES API =====
-
-// Test API
+// ✅ TEST API
 app.get("/api/test", (req, res) => {
   res.json({
     status: "ok",
@@ -23,7 +22,7 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-// Chat API (CE QUE LE BOUTON UTILISE)
+// ✅ CHAT API
 app.post("/api/chat", (req, res) => {
   const { message } = req.body;
 
@@ -36,13 +35,11 @@ app.post("/api/chat", (req, res) => {
   });
 });
 
-// ===== FRONTEND =====
+// Frontend fallback
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`SERVER OK on port ${PORT}`);
+  console.log("SERVER OK on port", PORT);
 });
-

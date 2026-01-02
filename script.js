@@ -1,24 +1,27 @@
-document.getElementById("sendBtn").addEventListener("click", async () => {
-  const input = document.getElementById("messageInput");
-  const responseBox = document.getElementById("response");
+const input = document.querySelector("input");
+const button = document.querySelector("button");
 
-  const message = input.value;
+button.addEventListener("click", async () => {
+  const message = input.value.trim();
   if (!message) return;
 
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ message }),
     });
 
     const data = await res.json();
-    responseBox.innerText = data.reply;
+    alert(data.reply); // ou affiche-le dans la page
+    input.value = "";
   } catch (err) {
-    responseBox.innerText = "Erreur serveur";
+    alert("Erreur serveur");
+    console.error(err);
   }
 });
-
 
 
 
