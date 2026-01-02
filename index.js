@@ -9,15 +9,36 @@ const app = express();
 app.use(express.json());
 
 // =========================
-// API ROUTES (AVANT TOUT)
+// API TEST (VALIDÉ)
 // =========================
 app.get("/api/test", (req, res) => {
   res.json({
     status: "ok",
-    message: "API TEST RENDER V2"
+    message: "API connected successfully"
   });
 });
 
+// =========================
+// CHAT API (1 PHRASE MAX)
+// =========================
+app.post("/api/chat", (req, res) => {
+  const message = String(req.body.message || "").toLowerCase();
+  let reply = "Avance maintenant.";
+
+  if (message.includes("rate")) {
+    reply = "Identifie une erreur et corrige-la aujourd hui.";
+  } else if (message.includes("fatigu")) {
+    reply = "Prends dix minutes de pause puis reprends une tache simple.";
+  } else if (message.includes("aide")) {
+    reply = "Choisis une action precise et fais-la maintenant.";
+  } else if (message.includes("peur") || message.includes("stress")) {
+    reply = "Respire, decide et passe a l action.";
+  }
+
+  // GARANTIE : UNE SEULE PHRASE
+  reply = reply.split(".")[0] + ".";
+  res.json({ reply });
+});
 
 // =========================
 // STATIC FILES (ROOT)
@@ -25,7 +46,7 @@ app.get("/api/test", (req, res) => {
 app.use(express.static(__dirname));
 
 // =========================
-// FALLBACK
+// FRONTEND FALLBACK
 // =========================
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
