@@ -27,19 +27,22 @@ app.post("/api/chat", (req, res) => {
   const { message } = req.body;
 
   if (!message) {
-    return res.status(400).json({ error: "Message manquant" });
+    return res.status(400).json({ reply: "Message manquant" });
   }
 
-  res.json({
-    reply: `Message reçu : ${message}`,
-  });
+  const msg = message.toLowerCase();
+  let reply = "";
+
+  if (msg.includes("salut") || msg.includes("bonjour")) {
+    reply = "Salut 👋 comment je peux t’aider ?";
+  } else if (msg.includes("comment") && msg.includes("va")) {
+    reply = "Ça va très bien 💪 et toi ?";
+  } else if (msg.includes("aide")) {
+    reply = "Je peux discuter avec toi ou t’aider sur le site 😊";
+  } else {
+    reply = `J’ai bien reçu ton message : ${message}`;
+  }
+
+  res.json({ reply });
 });
 
-// Frontend fallback
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-app.listen(PORT, () => {
-  console.log("SERVER OK on port", PORT);
-});
