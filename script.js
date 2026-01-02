@@ -1,27 +1,42 @@
+const chatBox = document.getElementById("chatBox");
 const input = document.getElementById("messageInput");
-const button = document.getElementById("sendBtn");
+const btn = document.getElementById("sendBtn");
 
-button.addEventListener("click", async () => {
+function addBubble(text, type) {
+  const div = document.createElement("div");
+  div.className = `bubble ${type}`;
+  div.textContent = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+btn.addEventListener("click", sendMessage);
+
+input.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
+
+async function sendMessage() {
   const message = input.value.trim();
   if (!message) return;
+
+  addBubble(message, "user");
+  input.value = "";
 
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
     });
 
     const data = await res.json();
-    alert(data.reply);
-    input.value = "";
+    addBubble(data.reply, "bot");
+
   } catch (err) {
-    console.error(err);
-    alert("Erreur serveur");
+    addBubble("Erreur serveur", "bot");
   }
-});
+}
 
 
 
