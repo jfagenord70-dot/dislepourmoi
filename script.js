@@ -1,32 +1,33 @@
-alert("SCRIPT JS CHARGÉ");
+const input = document.querySelector("input");
+const button = document.querySelector("button");
+const chat = document.querySelector(".chat");
 
-const input = document.getElementById("message");
-const button = document.getElementById("send");
-const chatBox = document.getElementById("chat");
-
-button.addEventListener("click", async (e) => {
-  e.preventDefault(); // 🔥 BLOQUE le reload
-
-  const text = input.value.trim();
-  if (!text) return;
-
-  chatBox.innerHTML += `<div><b>Toi :</b> ${text}</div>`;
-  input.value = "";
-
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-
-    const data = await res.json();
-    chatBox.innerHTML += `<div><b>Bot :</b> ${data.reply}</div>`;
-  } catch (err) {
-    chatBox.innerHTML += `<div>❌ Erreur serveur</div>`;
-  }
+button.addEventListener("click", sendMessage);
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendMessage();
 });
 
+function sendMessage() {
+  const message = input.value.trim();
+  if (!message) return;
+
+  chat.innerHTML += `<p><strong>Toi :</strong> ${message}</p>`;
+  input.value = "";
+
+  fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message })
+  })
+    .then(res => res.json())
+    .then(data => {
+      chat.innerHTML += `<p><strong>Bot :</strong> ${data.reply}</p>`;
+      chat.scrollTop = chat.scrollHeight;
+    })
+    .catch(() => {
+      chat.innerHTML += `<p><strong>Bot :</strong> ❌ Erreur serveur</p>`;
+    });
+}
 
 
 
