@@ -1,9 +1,5 @@
-import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require("express");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// ✅ TEST API
+// TEST API
 app.get("/api/test", (req, res) => {
   res.json({
     status: "ok",
@@ -20,7 +16,7 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-// ✅ CHAT API (SMART REPLIES)
+// CHAT API
 app.post("/api/chat", (req, res) => {
   const { message } = req.body;
 
@@ -29,15 +25,12 @@ app.post("/api/chat", (req, res) => {
   }
 
   let reply = "Message reçu : " + message;
-
   const msg = message.toLowerCase();
 
   if (msg.includes("salut") || msg.includes("bonjour")) {
     reply = "Salut 👋 comment je peux t’aider ?";
-  } else if (msg.includes("comment ça va")) {
+  } else if (msg.includes("comment")) {
     reply = "Ça va très bien 💪 et toi ?";
-  } else if (msg.includes("merci")) {
-    reply = "Avec plaisir 😊";
   }
 
   res.json({ reply });
