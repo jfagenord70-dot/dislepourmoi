@@ -1,15 +1,21 @@
 body {
   background: #0f172a;
-  font-family: Arial, sans-serif;
   color: white;
+  font-family: Arial, sans-serif;
 }
 
-.chat {
+.chat-box {
   width: 400px;
   margin: 80px auto;
-  background: #020617;
   padding: 20px;
-  border-radius: 12px;
+  background: #020617;
+  border-radius: 10px;
+}
+
+#chat {
+  height: 300px;
+  overflow-y: auto;
+  margin-bottom: 10px;
 }
 
 input {
@@ -19,8 +25,5 @@ input {
 
 button {
   padding: 8px 12px;
-  margin-left: 5px;
   cursor: pointer;
 }
-
-

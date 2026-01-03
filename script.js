@@ -1,36 +1,38 @@
-const input = document.querySelector("input");
-const button = document.querySelector("button");
-const chat = document.querySelector(".chat");
+console.log("SCRIPT CHARGÉ");
 
-button.addEventListener("click", sendMessage);
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendMessage();
-});
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM OK");
 
-function sendMessage() {
-  const message = input.value.trim();
-  if (!message) return;
+  const button = document.getElementById("sendBtn");
+  const input = document.getElementById("messageInput");
+  const chat = document.getElementById("chat");
 
-  chat.innerHTML += `<p><strong>Toi :</strong> ${message}</p>`;
-  input.value = "";
+  if (!button || !input || !chat) {
+    console.error("ÉLÉMENT MANQUANT");
+    return;
+  }
 
-  fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message })
-  })
-    .then(res => res.json())
-    .then(data => {
+  button.addEventListener("click", sendMessage);
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    chat.innerHTML += `<p><strong>Toi :</strong> ${text}</p>`;
+    input.value = "";
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      });
+
+      const data = await res.json();
       chat.innerHTML += `<p><strong>Bot :</strong> ${data.reply}</p>`;
-      chat.scrollTop = chat.scrollHeight;
-    })
-    .catch(() => {
-      chat.innerHTML += `<p><strong>Bot :</strong> ❌ Erreur serveur</p>`;
-    });
-}
-
-
-
-
-
-
+    } catch (err) {
+      chat.innerHTML += `<p style="color:red">Erreur serveur</p>`;
+      console.error(err);
+    }
+  }
+});
