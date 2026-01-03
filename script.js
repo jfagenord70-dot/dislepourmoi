@@ -1,55 +1,32 @@
+alert("SCRIPT JS CHARGÉ");
+
 const input = document.getElementById("message");
 const button = document.getElementById("send");
 const chatBox = document.getElementById("chat");
 
-// 🔥 Sécurité : vérifier que les éléments existent
-if (!input || !button || !chatBox) {
-  console.error("Éléments HTML manquants ❌");
-}
+button.addEventListener("click", async (e) => {
+  e.preventDefault(); // 🔥 BLOQUE le reload
 
-// ➕ Ajouter un message dans le chat
-function addMessage(text, sender) {
-  const div = document.createElement("div");
-  div.className = sender === "user" ? "user-msg" : "bot-msg";
-  div.innerText = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// 🧠 CLICK SUR ENVOYER
-button.addEventListener("click", async () => {
   const text = input.value.trim();
+  if (!text) return;
 
-  if (text === "") return;
-
-  // Message utilisateur
-  addMessage("Toi : " + text, "user");
+  chatBox.innerHTML += `<div><b>Toi :</b> ${text}</div>`;
   input.value = "";
 
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message: text }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
     });
 
     const data = await res.json();
-
-    addMessage("Bot : " + data.reply, "bot");
+    chatBox.innerHTML += `<div><b>Bot :</b> ${data.reply}</div>`;
   } catch (err) {
-    console.error(err);
-    addMessage("Bot : Erreur serveur ❌", "bot");
+    chatBox.innerHTML += `<div>❌ Erreur serveur</div>`;
   }
 });
 
-// ⌨️ ENTRÉE CLAVIER (Enter)
-input.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    button.click();
-  }
-});
 
 
 
