@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dislepourmoi</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -11,10 +11,16 @@
 
   <div id="chat"></div>
 
-  <input id="messageInput" type="text" placeholder="Écris ici..." />
-  <button id="sendBtn" type="button">Envoyer</button>
+  <form id="chatForm">
+    <input
+      id="messageInput"
+      type="text"
+      placeholder="Écris ici..."
+      autocomplete="off"
+    />
+    <button type="submit">Envoyer</button>
+  </form>
 
-  <!-- SCRIPT TOUJOURS EN BAS -->
   <script src="script.js"></script>
 </body>
 </html>

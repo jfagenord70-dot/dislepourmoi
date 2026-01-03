@@ -2,38 +2,31 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 
+const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
-
-// Middlewares
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// API CHAT
 app.post("/api/chat", (req, res) => {
-  const message = req.body.message || "";
-  const msg = message.toLowerCase();
+  const { message } = req.body;
 
-  let reply = "🤖 J’ai bien reçu ton message.";
+  if (!message) {
+    return res.status(400).json({ reply: "Message vide" });
+  }
 
-  if (msg.includes("salut") || msg.includes("bonjour")) {
+  let reply = `J’ai bien reçu « ${message} », mais j’apprends encore 🙂`;
+
+  if (message.toLowerCase().includes("salut")) {
     reply = "Salut 👋 comment ça va ?";
-  } 
-  else if (msg.includes("ça va") || msg.includes("ca va")) {
+  } else if (message.toLowerCase().includes("ça va")) {
     reply = "Ça va tranquille 😌 et toi ?";
-  } 
-  else if (msg.includes("raté") || msg.includes("rate")) {
-    reply = "😅 J’ai bien reçu « j’ai raté », mais t’inquiète, on apprend tous.";
+  } else if (message.toLowerCase().includes("raté")) {
+    reply = "T’inquiète, on apprend tous 💪";
   }
 
   res.json({ reply });
-});
-
-// Frontend
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 const PORT = process.env.PORT || 10000;
