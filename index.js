@@ -5,41 +5,34 @@ import { fileURLToPath } from "url";
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Pour __dirname en ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middlewares
+// Middleware JSON
 app.use(express.json());
+
+// Servir fichiers statiques (HTML, CSS, JS)
 app.use(express.static(__dirname));
 
-// ===== TEST API =====
+// Test API
 app.get("/api/test", (req, res) => {
-  res.json({
-    status: "ok",
-    message: "API connected successfully"
-  });
+  res.json({ status: "ok", message: "API connected successfully" });
 });
 
-// ===== CHAT API =====
+// Chat API
 app.post("/api/chat", (req, res) => {
   const { message } = req.body;
-
   if (!message) {
     return res.status(400).json({ error: "Message manquant" });
   }
-
-  res.json({
-    reply: `Message reçu : ${message}`
-  });
+  res.json({ reply: "Message reçu : " + message });
 });
 
-// ===== FRONTEND (OBLIGATOIRE POUR PAGE BLANCHE) =====
+// Frontend fallback (CRUCIAL)
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log("SERVER OK on port " + PORT);
 });
