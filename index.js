@@ -1,4 +1,5 @@
-// index.js
+// index.js — Dislepourmoi BACKEND (FINAL, IA-READY)
+
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -16,23 +17,32 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 /* =========================
+   HEALTH CHECK (OPTIONNEL)
+========================= */
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+/* =========================
    API CHAT
 ========================= */
-app.post("/api/chat", (req, res) => {
-  const message = req.body?.message;
-
-  // 🔒 Sécurité minimale (PAS BLOQUANTE)
-  if (!message || typeof message !== "string") {
-    return res.json({
-      reply: "🫂 Mwen la. Eseye ekri mesaj ou ankò."
-    });
-  }
-
+app.post("/api/chat", async (req, res) => {
   try {
-    const reply = getAIReply(message);
+    const message = req.body?.message;
+
+    // Sécurité légère (non bloquante)
+    if (!message || typeof message !== "string") {
+      return res.json({
+        reply: "🫂 Mwen la pou koute w. Eseye ekri mesaj ou ankò."
+      });
+    }
+
+    // ⚠️ IMPORTANT : appel ASYNC
+    const reply = await getAIReply(message);
     return res.json({ reply });
+
   } catch (err) {
-    console.error("AI ERROR:", err);
+    console.error("CHAT ERROR:", err);
     return res.json({
       reply: "😔 Gen yon ti pwoblèm. Ann eseye ankò."
     });
@@ -42,7 +52,7 @@ app.post("/api/chat", (req, res) => {
 /* =========================
    SERVER
 ========================= */
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log("✅ Server running on port", PORT);
+  console.log("✅ SERVER OK on port", PORT);
 });
