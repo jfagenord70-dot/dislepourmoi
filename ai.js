@@ -2,7 +2,7 @@ let lastIntent = "";
 
 export async function getAIReply(message) {
   const text = normalize(message);
-  const { intent, reply } = generateReply(text);
+  const { intent, reply } = decideReply(text);
 
   let finalReply = reply;
 
@@ -22,7 +22,7 @@ function normalize(text) {
     .trim();
 }
 
-function generateReply(text) {
+function decideReply(text) {
   if (["salut", "yo", "bonjour"].includes(text)) {
     return {
       intent: "greeting",

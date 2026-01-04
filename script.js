@@ -3,8 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("messageInput");
   const chat = document.getElementById("chat");
 
+  // Message d’accueil
+  chat.innerHTML += `
+    <p><strong>Bot :</strong> 👋 Salut ! Je suis Dislepourmoi.
+    Parle-moi librement, je suis là pour t’écouter.</p>
+  `;
+
   form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // 🔒 empêche le reload
+    e.preventDefault();
 
     const text = input.value.trim();
     if (!text) return;
@@ -21,10 +27,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
       chat.innerHTML += `<p><strong>Bot :</strong> ${data.reply}</p>`;
-    } catch (err) {
+    } catch {
       chat.innerHTML += `<p style="color:red">Erreur serveur</p>`;
     }
 
-    chat.scrollTop = chat.scrollHeight;
+    chat.scrollTo({
+      top: chat.scrollHeight,
+      behavior: "smooth"
+    });
   });
 });
