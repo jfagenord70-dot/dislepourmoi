@@ -1,124 +1,63 @@
-let lastIntent = "";
+// ai.js — Dislepourmoi logic (FR + KREYOL)
 
-export async function getAIReply(message) {
-  const text = normalize(message);
-  const { intent, reply } = decideReply(text);
-
-  let finalReply = reply;
-
-  if (intent === lastIntent) {
-    finalReply = diversify(intent);
+export function getAIReply(input) {
+  if (!input) {
+    return "M ap la pou koute w. Pale avè m 🙂";
   }
 
-  lastIntent = intent;
-  return finalReply;
-}
-
-function normalize(text) {
-  return text
+  const text = input
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim();
-}
 
-function decideReply(text) {
-  // SALUTATIONS (FR + KREYOL)
+  // === SALUTATIONS ===
   if (
-    ["salut", "yo", "bonjour", "bonjou", "sak pase", "sakapase"].includes(text)
+    text.includes("salut") ||
+    text.includes("bonjour") ||
+    text.includes("bonsoir") ||
+    text.includes("bonjou")
   ) {
-    return {
-      intent: "greeting",
-      reply: "Bonjou 👋 / Salut 🙂 kijan ou ye jodi a ?"
-    };
+    return "👋 Salut ! Comment tu te sens aujourd’hui ?";
   }
 
-  // ÇA VA / MWEN BYEN
+  // === BIEN / PAS BIEN (KREYOL) ===
   if (
-    text.includes("ca va") ||
     text.includes("mwen byen") ||
-    text.includes("mwen byen") ||
-    text.includes("trankil") ||
-    text.includes("tranquille")
+    text.includes("m byen") ||
+    text.includes("sa bon")
   ) {
-    return {
-      intent: "status",
-      reply: "Sa fè m plezi 😊 tout bagay trankil. E ou menm ?"
-    };
+    return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
   }
 
-  // ECHEC / RATE
+  if (
+    text.includes("mwen pa byen") ||
+    text.includes("m pa byen") ||
+    text.includes("pa two byen") ||
+    text.includes("pa bon")
+  ) {
+    return "😔 M ap tande w… Ou vle pale m de sa k ap pase ?";
+  }
+
+  // === RATE / DIFFICULTÉ ===
   if (
     text.includes("rate") ||
-    text.includes("echwe") ||
-    text.includes("mwen rate") ||
-    text.includes("mwen echwe")
+    text.includes("difisil") ||
+    text.includes("fatige")
   ) {
-    return {
-      intent: "failure",
-      reply:
-        "😌 Pa dekouraje. Rater fè pati chemen an. Ki sa ou ta renmen amelyore ?"
-    };
+    return "😌 T’inquiète, rater fait partie du chemin. Tu veux t’améliorer sur quoi ?";
   }
 
-  // ETAT EMOTIONNEL
+  // === QUESTION OU OUVERTURE ===
   if (
-    text.includes("pa byen") ||
-    text.includes("fatige") ||
-    text.includes("tris") ||
-    text.includes("stress")
+    text.includes("?") ||
+    text.startsWith("poukisa") ||
+    text.startsWith("kijan") ||
+    text.startsWith("comment")
   ) {
-    return {
-      intent: "emotion",
-      reply:
-        "Mwen konprann 🤍 pran tan w. Ou ka di m sa k ap pase si ou vle."
-    };
+    return "🤔 Bon kestyon. Explike m yon ti kras plis.";
   }
 
-  // MESSAGE TROP COURT
-  if (text.length < 3) {
-    return {
-      intent: "short",
-      reply: "Hmm 🤔 di m yon ti kras plis."
-    };
-  }
-
-  // DEFAULT
-  return {
-    intent: "other",
-    reply:
-      "Mwen la pou t koute 👂. Explike m sa pi byen, m ap suiv ou."
-  };
+  // === DEFAULT (DERNIER RECOURS) ===
+  return "👀 Mwen konprann… kontinye pale avè m, m ap koute w.";
 }
-
-function diversify(intent) {
-  const variants = {
-    greeting: [
-      "Hey 👋 kijan jounen an ye ?",
-      "Bonjou 🙂 kontan tande w",
-      "Salut, m ap koute w"
-    ],
-    status: [
-      "Sa bon 😊 e moral la ?",
-      "Dakò 👍 ou santi w byen vrèman ?",
-      "Mwen kontan tande sa"
-    ],
-    failure: [
-      "Tout moun rate yon jou 💪",
-      "Pa prese, ou sou bon wout la",
-      "Erè se pwofesè 👌"
-    ],
-    emotion: [
-      "Pran souf 😌 m ap koute w",
-      "Ou pa poukont ou",
-      "Pale, sa ka soulaje"
-    ],
-    other: [
-      "Mwen konprann 👀 kontinye",
-      "Sa enteresan, di m plis",
-      "M ap suiv refleksyon w"
-    ]
-  };
-
-  const list = variants[intent] || variants.other;
-  return list[Math.floor(Math.random() * list.len*]()
