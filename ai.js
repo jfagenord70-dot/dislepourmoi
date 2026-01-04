@@ -1,37 +1,67 @@
-// ai.js
+// ai.js — Dislepourmoi FINAL
 
-let conversationLang = null; // "fr" | "kr"
+let conversationLang = null; // "kr" | "fr"
 
+/* =========================
+   🛠️ AUTOCORRECTION SIMPLE
+========================= */
+function autocorrect(text) {
+  const fixes = {
+    "bye": "byen",
+    "fatiger": "fatige",
+    "fatiguee": "fatigue",
+    "ratee": "rate",
+    "rater": "rate",
+    "sa va": "ça va"
+  };
+
+  return text
+    .split(" ")
+    .map(word => fixes[word] || word)
+    .join(" ");
+}
+
+/* =========================
+   🔍 DETECTION LANGUE
+========================= */
 function detectLanguage(text) {
   const kreyolWords = [
-    "mwen", "byen", "pa", "fatige", "rate", "sak", "pase", "kijan", "ou", "sa"
+    "mwen", "byen", "pa", "fatige", "rate",
+    "kijan", "kisa", "sak", "pase", "santi"
   ];
 
-  const lower = text.toLowerCase();
-
   for (const w of kreyolWords) {
-    if (lower.includes(w)) return "kr";
+    if (text.includes(w)) return "kr";
   }
 
   return "fr";
 }
 
-export default function getAIReply(text) {
-  const clean = text.toLowerCase().trim();
+/* =========================
+   🤖 MAIN FUNCTION
+========================= */
+export default function getAIReply(input) {
+  if (!input || typeof input !== "string") {
+    return "🫂 Mwen la pou koute w.";
+  }
 
-  // 🔒 Langue fixée au premier message
+  let clean = input
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+
+  clean = autocorrect(clean);
+
+  // 🔒 Lang fixée au premier message
   if (!conversationLang) {
     conversationLang = detectLanguage(clean);
   }
 
   /* =========================
-     🇭🇹 KREYÒL
+     🇭🇹 KREYÒL (LOCK)
   ========================= */
   if (conversationLang === "kr") {
-    if (clean.includes("byen") && !clean.includes("pa")) {
-      return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
-    }
-
     if (clean.includes("pa byen")) {
       return "😔 M ap tande w… Ou vle pale m de sa k ap pase ?";
     }
@@ -44,23 +74,28 @@ export default function getAIReply(text) {
       return "💙 Rater fè pati chemen an. Sa w ta renmen amelyore ?";
     }
 
+    if (clean === "mwen byen") {
+      return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
+    }
+
+    if (clean.includes("bonjou") || clean.includes("salut")) {
+      return "👋 Bonjou. Kijan ou santi w jodi a ?";
+    }
+
     return "👂 Mwen la, pale avè m. Pran tan w.";
   }
 
   /* =========================
-     🇫🇷 FRANÇAIS
+     🇫🇷 FRANÇAIS (LOCK)
   ========================= */
-  if (clean.includes("ça va")) {
-    return "😊 Tant mieux. Qu’est-ce qui te fait te sentir comme ça ?";
-  }
+  if (conversationLang === "fr") {
+    if (clean.includes("pas bien")) {
+      return "😔 Je t’écoute. Tu veux m’expliquer ce qui se passe ?";
+    }
 
-  if (clean.includes("fatigu")) {
-    return "😌 La fatigue peut peser. C’est plutôt physique ou mental ?";
-  }
+    if (clean.includes("fatigu")) {
+      return "😌 La fatigue peut peser. C’est plutôt physique ou mental ?";
+    }
 
-  if (clean.includes("rat")) {
-    return "💙 Rater fait partie du chemin. Tu veux t’améliorer sur quoi ?";
-  }
-
-  return "👂 Je t’écoute. Prends ton temps.";
-}
+    if (clean.includes("rate")) {
+      return "💙 Rater fait partie du
