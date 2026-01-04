@@ -1,81 +1,88 @@
-// ai.js — Dislepourmoi (FR / KREYOL clean & logique)
+// ai.js
 
-export function getAIReply(input) {
-  if (!input) {
-    return "M ap la pou koute w 🙂";
+export default function getAIReply(text) {
+  const msg = text.toLowerCase().trim();
+
+  const isKreyol = detectKreyol(msg);
+  const isFrench = detectFrench(msg);
+
+  if (isKreyol && !isFrench) {
+    return replyKreyol(msg);
   }
 
-  const text = input
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-
-  // =====================
-  // === DETECT LANGUE ===
-  // =====================
-  const isKreyol =
-    text.includes("mwen") ||
-    text.includes("pa") ||
-    text.includes("byen") ||
-    text.includes("fatige") ||
-    text.includes("rate") ||
-    text.includes("sak pase") ||
-    text.includes("kijan");
-
-  // =====================
-  // ===== KREYOL =========
-  // =====================
-  if (isKreyol) {
-    if (text.includes("pa byen")) {
-      return "😔 M ap tande w… Ou vle pale m de sa k ap pase ?";
-    }
-
-    if (text.includes("fatige")) {
-      return "😌 Sa rive tout moun. Ki sa k ap fatige w konsa ?";
-    }
-
-    if (text.includes("rate")) {
-      return "💙 Rater fè pati chemen an. Sa w ta renmen amelyore ?";
-    }
-
-    if (text.includes("mwen byen") || text === "byen") {
-      return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
-    }
-
-    if (text.includes("salut") || text.includes("bonjou")) {
-      return "👋 Bonjou. Kijan ou santi w jodi a ?";
-    }
-
-    return "👀 Mwen la, kontinye pale avè m.";
+  if (isFrench && !isKreyol) {
+    return replyFrench(msg);
   }
 
-  // =====================
-  // ===== FRANÇAIS ======
-  // =====================
-  if (text.includes("pas bien")) {
-    return "😔 Je t’écoute. Tu veux m’expliquer ce qui se passe ?";
+  // fallback si mixte ou inconnu
+  return "🫂 M ap koute w. Ou ka eksplike m plis ?";
+}
+
+/* =========================
+   🔍 DÉTECTION LANGUE
+========================= */
+
+function detectKreyol(text) {
+  const keywords = [
+    "mwen", "byen", "pa byen", "fatige", "rate",
+    "sa va", "kijan", "kisa", "pase", "trankil",
+    "m ap", "mwen pa", "sak pase"
+  ];
+  return keywords.some(k => text.includes(k));
+}
+
+function detectFrench(text) {
+  const keywords = [
+    "je", "ça va", "pas bien", "fatigué",
+    "raté", "comment", "pourquoi", "parce que"
+  ];
+  return keywords.some(k => text.includes(k));
+}
+
+/* =========================
+   🇭🇹 RÉPONSES KREYÒL
+========================= */
+
+function replyKreyol(text) {
+  if (text.includes("mwen byen")) {
+    return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
   }
 
-  if (text.includes("fatigue") || text.includes("fatigue")) {
-    return "😌 La fatigue peut peser. C’est physique ou mental ?";
+  if (text.includes("mwen pa byen")) {
+    return "😔 M ap tande w… Ou vle pale m de sa k ap pase ?";
   }
 
-  if (text.includes("rate") || text.includes("raté")) {
-    return "💙 Rater fait partie du chemin. Tu veux t’améliorer sur quoi ?";
+  if (text.includes("mwen fatige")) {
+    return "😌 Sa rive tout moun. Ki sa k ap fatige w konsa ?";
   }
 
-  if (text.includes("ca va") || text.includes("ça va")) {
+  if (text.includes("mwen rate")) {
+    return "💙 Rater fè pati chemen an. Sa w ta renmen amelyore ?";
+  }
+
+  return "🫂 Mwen la pou koute w. Kontinye pale avè m.";
+}
+
+/* =========================
+   🇫🇷 RÉPONSES FRANÇAIS
+========================= */
+
+function replyFrench(text) {
+  if (text.includes("ça va")) {
     return "😊 Tant mieux. Qu’est-ce qui te fait te sentir comme ça ?";
   }
 
-  if (
-    text.includes("salut") ||
-    text.includes("bonjour") ||
-    text.includes("bonsoir")
-  ) {
-    return "👋 Salut ! Comment tu te sens aujourd’hui ?";
+  if (text.includes("pas bien")) {
+    return "😔 Je t’écoute… tu veux m’expliquer ce qui se passe ?";
   }
 
-  return "👀 Je t’écoute, dis-m’en plus.";
+  if (text.includes("fatigué")) {
+    return "😌 La fatigue peut peser. C’est plutôt physique ou mental ?";
+  }
+
+  if (text.includes("raté")) {
+    return "💙 Rater fait partie du chemin. Tu veux t’améliorer sur quoi ?";
+  }
+
+  return "🫂 Je suis là pour t’écouter. Dis-m’en plus.";
 }
