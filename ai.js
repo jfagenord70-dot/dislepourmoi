@@ -1,4 +1,4 @@
-// ai.js — Dislepourmoi FINAL ABSOLU
+// ai.js — Dislepourmoi FINAL (AUTO-SWITCH)
 
 let conversationLang = null; // "kr" | "fr"
 
@@ -10,7 +10,19 @@ function detectLanguage(text) {
     "mwen", "byen", "bye", "pa", "fatige", "rate",
     "kijan", "kisa", "sak", "pase", "santi"
   ];
-  return kreyolWords.some(w => text.includes(w)) ? "kr" : "fr";
+
+  const frenchWords = [
+    "je", "tu", "ça", "va", "pas", "bien",
+    "fatigu", "raté", "pourquoi", "comment"
+  ];
+
+  let krScore = kreyolWords.filter(w => text.includes(w)).length;
+  let frScore = frenchWords.filter(w => text.includes(w)).length;
+
+  if (krScore > frScore) return "kr";
+  if (frScore > krScore) return "fr";
+
+  return null;
 }
 
 /* =========================
@@ -27,21 +39,21 @@ export default function getAIReply(input) {
     .replace(/[\u0300-\u036f]/g, "")
     .trim();
 
-  // 🔒 Lang verrouillée au premier message
-  if (!conversationLang) {
-    conversationLang = detectLanguage(clean);
+  const detectedLang = detectLanguage(clean);
+
+  // 🔁 AUTO-SWITCH si la langue est claire
+  if (!conversationLang && detectedLang) {
+    conversationLang = detectedLang;
+  } else if (detectedLang && detectedLang !== conversationLang) {
+    conversationLang = detectedLang;
   }
 
   /* =========================
-     🇭🇹 KREYÒL (LOCK)
+     🇭🇹 KREYÒL
   ========================= */
   if (conversationLang === "kr") {
 
-    // ✅ POSITIF (mwen byen / mwen bye)
-    if (
-      clean.includes("mwen bye") ||
-      clean.includes("mwen byen")
-    ) {
+    if (clean.includes("mwen bye") || clean.includes("mwen byen")) {
       return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
     }
 
@@ -57,7 +69,7 @@ export default function getAIReply(input) {
       return "💙 Rater fè pati chemen an. Sa w ta renmen amelyore ?";
     }
 
-    if (clean.includes("bonjou") || clean.includes("salut")) {
+    if (clean.includes("salut") || clean.includes("bonjou")) {
       return "👋 Bonjou. Kijan ou santi w jodi a ?";
     }
 
@@ -65,7 +77,7 @@ export default function getAIReply(input) {
   }
 
   /* =========================
-     🇫🇷 FRANÇAIS (LOCK)
+     🇫🇷 FRANÇAIS
   ========================= */
   if (conversationLang === "fr") {
 
@@ -77,7 +89,7 @@ export default function getAIReply(input) {
       return "😌 La fatigue peut peser. C’est plutôt physique ou mental ?";
     }
 
-    if (clean.includes("rate")) {
+    if (clean.includes("rate") || clean.includes("raté")) {
       return "💙 Rater fait partie du chemin. Tu veux t’améliorer sur quoi ?";
     }
 
@@ -85,7 +97,7 @@ export default function getAIReply(input) {
       return "😊 Tant mieux. Qu’est-ce qui te fait te sentir comme ça ?";
     }
 
-    if (clean.includes("bonjour") || clean.includes("salut")) {
+    if (clean.includes("salut") || clean.includes("bonjour")) {
       return "👋 Salut ! Comment tu te sens aujourd’hui ?";
     }
 
