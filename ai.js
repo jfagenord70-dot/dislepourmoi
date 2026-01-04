@@ -1,55 +1,33 @@
-// ai.js — Dislepourmoi FINAL FIX 100%
+// ai.js — Dislepourmoi FINAL ABSOLU
 
 let conversationLang = null; // "kr" | "fr"
-
-/* =========================
-   🛠️ AUTOCORRECTION AVANT TOUT
-========================= */
-function autocorrect(text) {
-  const fixes = {
-    "bye": "byen",
-    "fatiger": "fatige",
-    "ratee": "rate",
-    "rater": "rate",
-    "sa va": "ça va"
-  };
-
-  return text
-    .split(/\s+/)
-    .map(w => fixes[w] || w)
-    .join(" ");
-}
 
 /* =========================
    🔍 DETECTION LANGUE
 ========================= */
 function detectLanguage(text) {
   const kreyolWords = [
-    "mwen", "byen", "pa", "fatige", "rate",
+    "mwen", "byen", "bye", "pa", "fatige", "rate",
     "kijan", "kisa", "sak", "pase", "santi"
   ];
   return kreyolWords.some(w => text.includes(w)) ? "kr" : "fr";
 }
 
 /* =========================
-   🤖 MAIN FUNCTION
+   🤖 MAIN
 ========================= */
 export default function getAIReply(input) {
   if (!input || typeof input !== "string") {
     return "🫂 Mwen la pou koute w.";
   }
 
-  // 🔹 Normalisation
   let clean = input
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim();
 
-  // 🔹 AUTOCORRECT D’ABORD
-  clean = autocorrect(clean);
-
-  // 🔒 Langue verrouillée APRÈS autocorrect
+  // 🔒 Lang verrouillée au premier message
   if (!conversationLang) {
     conversationLang = detectLanguage(clean);
   }
@@ -58,6 +36,14 @@ export default function getAIReply(input) {
      🇭🇹 KREYÒL (LOCK)
   ========================= */
   if (conversationLang === "kr") {
+
+    // ✅ POSITIF (mwen byen / mwen bye)
+    if (
+      clean.includes("mwen bye") ||
+      clean.includes("mwen byen")
+    ) {
+      return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
+    }
 
     if (clean.includes("pa byen")) {
       return "😔 M ap tande w… Ou vle pale m de sa k ap pase ?";
@@ -69,10 +55,6 @@ export default function getAIReply(input) {
 
     if (clean.includes("rate")) {
       return "💙 Rater fè pati chemen an. Sa w ta renmen amelyore ?";
-    }
-
-    if (clean.includes("mwen byen")) {
-      return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
     }
 
     if (clean.includes("bonjou") || clean.includes("salut")) {
