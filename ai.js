@@ -1,23 +1,22 @@
-// ai.js — Dislepourmoi FINAL
+// ai.js — Dislepourmoi FINAL FIX 100%
 
 let conversationLang = null; // "kr" | "fr"
 
 /* =========================
-   🛠️ AUTOCORRECTION SIMPLE
+   🛠️ AUTOCORRECTION AVANT TOUT
 ========================= */
 function autocorrect(text) {
   const fixes = {
     "bye": "byen",
     "fatiger": "fatige",
-    "fatiguee": "fatigue",
     "ratee": "rate",
     "rater": "rate",
     "sa va": "ça va"
   };
 
   return text
-    .split(" ")
-    .map(word => fixes[word] || word)
+    .split(/\s+/)
+    .map(w => fixes[w] || w)
     .join(" ");
 }
 
@@ -29,12 +28,7 @@ function detectLanguage(text) {
     "mwen", "byen", "pa", "fatige", "rate",
     "kijan", "kisa", "sak", "pase", "santi"
   ];
-
-  for (const w of kreyolWords) {
-    if (text.includes(w)) return "kr";
-  }
-
-  return "fr";
+  return kreyolWords.some(w => text.includes(w)) ? "kr" : "fr";
 }
 
 /* =========================
@@ -45,15 +39,17 @@ export default function getAIReply(input) {
     return "🫂 Mwen la pou koute w.";
   }
 
+  // 🔹 Normalisation
   let clean = input
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim();
 
+  // 🔹 AUTOCORRECT D’ABORD
   clean = autocorrect(clean);
 
-  // 🔒 Lang fixée au premier message
+  // 🔒 Langue verrouillée APRÈS autocorrect
   if (!conversationLang) {
     conversationLang = detectLanguage(clean);
   }
@@ -62,6 +58,7 @@ export default function getAIReply(input) {
      🇭🇹 KREYÒL (LOCK)
   ========================= */
   if (conversationLang === "kr") {
+
     if (clean.includes("pa byen")) {
       return "😔 M ap tande w… Ou vle pale m de sa k ap pase ?";
     }
@@ -74,7 +71,7 @@ export default function getAIReply(input) {
       return "💙 Rater fè pati chemen an. Sa w ta renmen amelyore ?";
     }
 
-    if (clean === "mwen byen") {
+    if (clean.includes("mwen byen")) {
       return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
     }
 
@@ -89,6 +86,7 @@ export default function getAIReply(input) {
      🇫🇷 FRANÇAIS (LOCK)
   ========================= */
   if (conversationLang === "fr") {
+
     if (clean.includes("pas bien")) {
       return "😔 Je t’écoute. Tu veux m’expliquer ce qui se passe ?";
     }
@@ -98,4 +96,19 @@ export default function getAIReply(input) {
     }
 
     if (clean.includes("rate")) {
-      return "💙 Rater fait partie du
+      return "💙 Rater fait partie du chemin. Tu veux t’améliorer sur quoi ?";
+    }
+
+    if (clean.includes("ca va") || clean.includes("ça va")) {
+      return "😊 Tant mieux. Qu’est-ce qui te fait te sentir comme ça ?";
+    }
+
+    if (clean.includes("bonjour") || clean.includes("salut")) {
+      return "👋 Salut ! Comment tu te sens aujourd’hui ?";
+    }
+
+    return "👂 Je t’écoute. Prends ton temps.";
+  }
+
+  return "Je suis là pour toi.";
+}
