@@ -1,103 +1,75 @@
-let currentLang = "kr";
+// PREUVE DE CHARGEMENT
+console.log("SCRIPT JS CHARGÉ");
+
+let currentLang = "fr";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("message");
-const sendBtn = document.getElementById("send");
+const form = document.getElementById("chat-form");
 const resetBtn = document.getElementById("reset");
-
-const btnKr = document.getElementById("btn-kr");
 const btnFr = document.getElementById("btn-fr");
+const btnKr = document.getElementById("btn-kr");
 
-/* =========================
-   🌍 LANGUE
-========================= */
-btnKr.onclick = () => switchLang("kr");
+// Langue
 btnFr.onclick = () => switchLang("fr");
+btnKr.onclick = () => switchLang("kr");
 
 function switchLang(lang) {
   currentLang = lang;
-
-  btnKr.classList.toggle("active", lang === "kr");
-  btnFr.classList.toggle("active", lang === "fr");
-
   resetConversation();
+  addBot(lang === "fr"
+    ? "👋 Salut ! Parle-moi librement."
+    : "👋 Bonjou ! Pale avè m libreman."
+  );
 }
 
-/* =========================
-   📤 ENVOI MESSAGE
-========================= */
-sendBtn.onclick = sendMessage;
-input.addEventListener("keypress", e => {
-  if (e.key === "Enter") sendMessage();
+// Envoi
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  sendMessage();
 });
 
 function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
-  // 🔁 RESET PAR TEXTE
-  if (text.toLowerCase() === "reset") {
-    input.value = "";
-    resetConversation();
-    return;
-  }
-
-  addUserMessage(text);
+  addUser(text);
   input.value = "";
 
-  fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message: text,
-      lang: currentLang
-    })
-  })
-    .then(res => res.json())
-    .then(data => addBotMessage(data.reply))
-    .catch(() =>
-      addBotMessage(
-        currentLang === "kr"
-          ? "😔 Erè. Eseye ankò."
-          : "😔 Erreur. Réessaie."
-      )
-    );
+  const reply = getReply(text);
+  addBot(reply);
 }
 
-/* =========================
-   🔄 RESET CONVERSATION
-========================= */
-resetBtn.onclick = resetConversation;
-
+// Reset
+resetBtn.addEventListener("click", resetConversation);
 function resetConversation() {
   chat.innerHTML = "";
-  addBotMessage(
-    currentLang === "kr"
-      ? "👋 Bonjou ! Pale avè m an kreyòl."
-      : "👋 Salut ! Parle-moi en français."
-  );
 }
 
-/* =========================
-   💬 AFFICHAGE
-========================= */
-function addUserMessage(text) {
-  const div = document.createElement("div");
-  div.className = "message user";
-  div.textContent = "Toi : " + text;
-  chat.appendChild(div);
+// UI
+function addUser(text) {
+  chat.innerHTML += `<p><b>Toi :</b> ${text}</p>`;
+  chat.scrollTop = chat.scrollHeight;
+}
+function addBot(text) {
+  chat.innerHTML += `<p><b>Bot :</b> ${text}</p>`;
   chat.scrollTop = chat.scrollHeight;
 }
 
-function addBotMessage(text) {
-  const div = document.createElement("div");
-  div.className = "message bot";
-  div.textContent = "Bot : " + text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
+// Réponses
+function getReply(text) {
+  const t = text.toLowerCase();
 
-/* =========================
-   🚀 INIT
-========================= */
-resetConversation();
+  if (currentLang === "kr") {
+    if (t.includes("byen")) return "😊 Mwen kontan tande sa. Ki sa ki fè w santi w byen jodi a ?";
+    if (t.includes("pa byen")) return "😔 M ap tande w… Ou vle pale m de sa k ap pase ?";
+    if (t.includes("fatige")) return "😌 Sa rive tout moun. Ki sa k ap fatige w konsa ?";
+    if (t.includes("rate")) return "💙 Rater fè pati chemen an. Sa w ta renmen amelyore ?";
+    return "👂 Mwen la, pale avè m. Pran tan w.";
+  }
+
+  if (t.includes("ça va")) return "😊 Tant mieux. Qu’est-ce qui te fait te sentir comme ça ?";
+  if (t.includes("fatigu")) return "😌 La fatigue peut peser. C’est plutôt physique ou mental ?";
+  if (t.includes("rat")) return "💙 Rater fait partie du chemin. Tu veux t’améliorer sur quoi ?";
+  return "👂 Je t’écoute. Prends ton temps.";
+}

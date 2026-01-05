@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dislepourmoi</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
 
@@ -18,20 +18,13 @@
 
   <form id="chat-form">
     <div id="input-area">
-      <input
-        id="message"
-        type="text"
-        placeholder="Écris ici..."
-        autocomplete="off"
-      />
-      <button type="submit" id="send">Envoyer</button>
-      <button type="button" id="reset">Reset</button>
+      <input id="message" type="text" placeholder="Écris ici..." autocomplete="off" />
+      <button id="send" type="submit">Envoyer</button>
+      <button id="reset" type="button">Reset</button>
     </div>
   </form>
 
-  <p class="warning"> Dislepourmoi n’est pas un professionnel de santé.</p>
-
-  <<script src="/script.js"></script>
-
+  <!-- IMPORTANT : chemin ABSOLU -->
+  <script src="/script.js?v=1"></script>
 </body>
 </html>
