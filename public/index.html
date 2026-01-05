@@ -10,14 +10,28 @@
   <h2>Un espace simple pour parler, réfléchir et avancer.</h2>
 
   <div id="language-switch">
-    <button id="btn-kr" class="lang-btn active">🇭🇹 Kreyòl</button>
-    <button id="btn-fr" class="lang-btn">🇫🇷 Français</button>
+    <button id="btn-fr">🇫🇷 Français</button>
+    <button id="btn-kr">🇭🇹 Kreyòl</button>
   </div>
 
   <div id="chat"></div>
 
- <div id="input-area">
-  <input id="message" type="text" placeholder="Écris ici..." />
-  <button id="send">Envoyer</button>
-  <button id="reset">Reset</button>
-</div>
+  <form id="chat-form">
+    <div id="input-area">
+      <input
+        id="message"
+        type="text"
+        placeholder="Écris ici..."
+        autocomplete="off"
+      />
+      <button type="submit" id="send">Envoyer</button>
+      <button type="button" id="reset">Reset</button>
+    </div>
+  </form>
+
+  <p class="warning"> Dislepourmoi n’est pas un professionnel de santé.</p>
+
+  <<script src="/script.js"></script>
+
+</body>
+</html>
