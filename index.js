@@ -1,51 +1,53 @@
-console.log("🔥 EXPRESS SERVER STARTED 🔥");
+import express from "express";
+import cors from "cors";
+import OpenAI from "openai";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const express = require("express");
-const OpenAI = require("openai");
-require("dotenv").config();
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 10000;
 
-// JSON middleware
+// ⬇️ CORS OBLIGATWA
+app.use(cors());
 app.use(express.json());
 
-// ROUTES AVANT static 👈👈👈
-app.get("/ping", (req, res) => {
-  res.send("pong");
-});
-
+// === OPENAI ===
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// === ROUTES API AVANT STATIC ===
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
+
 app.post("/chat", async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-
     const userMessage = req.body.message;
-    if (!userMessage) {
-      return res.status(400).json({ reply: "Message manquant" });
-    }
 
-    const response = await openai.responses.create({
-      model: "gpt-4.1-mini",
-      input: userMessage,
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: userMessage }],
     });
 
-    const reply = response.output_text;
-    console.log("IA:", reply);
-
-    res.json({ reply });
+    res.json({
+      reply: completion.choices[0].message.content,
+    });
   } catch (err) {
-    console.error("ERREUR IA:", err);
+    console.error(err);
     res.status(500).json({ reply: "Erreur IA" });
   }
 });
 
-// STATIC EN DERNIER 👈
-app.use(express.static("public"));
+// === STATIC FRONTEND ===
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, "public")));
 
-const PORT = process.env.PORT || 10000;
+// === START SERVER ===
 app.listen(PORT, () => {
-  console.log("SERVER OK on port", PORT);
+  console.log("🔥 EXPRESS SERVER STARTED on port", PORT);
 });

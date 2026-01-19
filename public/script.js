@@ -1,30 +1,43 @@
-const form = document.getElementById("form");
-const input = document.getElementById("message");
-const chat = document.getElementById("chat");
-const resetBtn = document.getElementById("reset");
+const chatForm = document.getElementById("chat-form");
+const messageInput = document.getElementById("message");
+const chatDiv = document.getElementById("chat");
 
-// 👉 URL backend (Render en prod, localhost en dev)
-const API_URL =
-  window.location.hostname.includes("localhost")
-    ? "http://localhost:10000"
-    : "https://dislepourmoi-backend.onrender.com";
-
-function addMessage(author, text) {
-  const p = document.createElement("p");
-  p.innerHTML = `<b>${author} :</b> ${text}`;
-  chat.appendChild(p);
-  chat.scrollTop = chat.scrollHeight;
+function addMessage(text, sender) {
+  const msg = document.createElement("div");
+  msg.className = sender;
+  msg.textContent = text;
+  chatDiv.appendChild(msg);
+  chatDiv.scrollTop = chatDiv.scrollHeight;
 }
 
-form.addEventListener("submit", async (e) => {
+chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const text = input.value.trim();
+  const text = messageInput.value.trim();
   if (!text) return;
 
-  addMessage("Toi", text);
-  input.value = "";
+  // Message utilisateur
+  addMessage(text, "user");
+  messageInput.value = "";
 
   try {
-    const res = await fetch(`${API_URL}/chat`, {
-      method: "POST",
+    const res = await fetch(
+      "https://dislepourmoi-backend.onrender.com/chat",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: text }),
+      }
+    );
+
+    const data = await res.json();
+
+    // Réponse IA
+    addMessage(data.reply, "bot");
+  } catch (err) {
+    addMessage("❌ Erreur serveur. Réessaie.", "bot");
+    console.error(err);
+  }
+});
