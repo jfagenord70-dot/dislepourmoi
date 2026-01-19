@@ -3,10 +3,9 @@ const messageInput = document.getElementById("message");
 const chatDiv = document.getElementById("chat");
 
 function addMessage(text, sender) {
-  const msg = document.createElement("div");
-  msg.className = sender;
-  msg.textContent = text;
-  chatDiv.appendChild(msg);
+  const div = document.createElement("div");
+  div.textContent = `${sender === "user" ? "Toi" : "IA"} : ${text}`;
+  chatDiv.appendChild(div);
   chatDiv.scrollTop = chatDiv.scrollHeight;
 }
 
@@ -16,28 +15,22 @@ chatForm.addEventListener("submit", async (e) => {
   const text = messageInput.value.trim();
   if (!text) return;
 
-  // Message utilisateur
   addMessage(text, "user");
   messageInput.value = "";
 
   try {
-    const res = await fetch(
-      "https://dislepourmoi-backend.onrender.com/chat",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: text }),
-      }
-    );
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: text }),
+    });
 
     const data = await res.json();
-
-    // Réponse IA
-    addMessage(data.reply, "bot");
+    addMessage(data.reply, "ai");
   } catch (err) {
-    addMessage("❌ Erreur serveur. Réessaie.", "bot");
     console.error(err);
+    addMessage("❌ Erreur de connexion", "ai");
   }
 });

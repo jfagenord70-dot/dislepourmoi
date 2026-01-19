@@ -10,44 +10,36 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// ⬇️ CORS OBLIGATWA
+// 🔥 OBLIGATOIRE POUR LE NAVIGATEUR
 app.use(cors());
 app.use(express.json());
 
-// === OPENAI ===
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// === ROUTES API AVANT STATIC ===
+// === TEST ROUTE ===
 app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
+// === CHAT ROUTE ===
 app.post("/chat", async (req, res) => {
   try {
-    const userMessage = req.body.message;
+    const { message } = req.body;
 
-    const completion = await openai.chat.completions.create({
+    if (!message) {
+      return res.status(400).json({ reply: "Message vide" });
+    }
+
+    const client = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [{ role: "user", content: userMessage }],
+      messages: [{ role: "user", content: message }],
     });
 
     res.json({
       reply: completion.choices[0].message.content,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ reply: "Erreur IA" });
-  }
-});
-
-// === STATIC FRONTEND ===
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, "public")));
-
-// === START SERVER ===
-app.listen(PORT, () => {
-  console.log("🔥 EXPRESS SERVER STARTED on port", PORT);
-});
+    console.error("❌ CHAT ERROR:", err);
+    res.status(500).json({ reply: "Err
