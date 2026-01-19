@@ -1,3 +1,5 @@
+console.log("🔥 EXPRESS SERVER STARTED 🔥");
+
 const express = require("express");
 const OpenAI = require("openai");
 require("dotenv").config();
