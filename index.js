@@ -1,19 +1,50 @@
-import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
+const express = require("express");
+const OpenAI = require("openai");
+require("dotenv").config();
 
 const app = express();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// MIDDLEWARES
+app.use(express.json());
+app.use(express.static("public"));
 
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+// TEST ROUTE (IMPORTANT)
+app.get("/ping", (req, res) => {
+  res.send("pong");
 });
 
-const PORT = process.env.PORT || 3000;
+// OPENAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// CHAT ROUTE
+app.post("/chat", async (req, res) => {
+  try {
+    console.log("BODY:", req.body);
+
+    const userMessage = req.body.message;
+    if (!userMessage) {
+      return res.status(400).json({ reply: "Message manquant" });
+    }
+
+    const response = await openai.responses.create({
+      model: "gpt-4.1-mini",
+      input: userMessage,
+    });
+
+    const reply = response.output_text;
+    console.log("IA:", reply);
+
+    res.json({ reply });
+  } catch (err) {
+    console.error("ERREUR:", err);
+    res.status(500).json({ reply: "Erreur IA" });
+  }
+});
+
+// PORT
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("SERVER OK on port", PORT);
 });

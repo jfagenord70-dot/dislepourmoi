@@ -1,17 +1,30 @@
-console.log("SCRIPT CHARGÉ ✅");
-
-const chat = document.getElementById("chat");
+const form = document.getElementById("form");
 const input = document.getElementById("message");
-const form = document.getElementById("chat-form");
+const chat = document.getElementById("chat");
 const resetBtn = document.getElementById("reset");
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  if (!input.value) return;
-  chat.innerHTML += `<p>Toi : ${input.value}</p>`;
-  input.value = "";
-});
+// 👉 URL backend (Render en prod, localhost en dev)
+const API_URL =
+  window.location.hostname.includes("localhost")
+    ? "http://localhost:10000"
+    : "https://dislepourmoi-backend.onrender.com";
 
-resetBtn.onclick = () => {
-  chat.innerHTML = "";
-};
+function addMessage(author, text) {
+  const p = document.createElement("p");
+  p.innerHTML = `<b>${author} :</b> ${text}`;
+  chat.appendChild(p);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage("Toi", text);
+  input.value = "";
+
+  try {
+    const res = await fetch(`${API_URL}/chat`, {
+      method: "POST",

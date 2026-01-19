@@ -2,26 +2,21 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Dislepourmoi</title>
-  <link rel="stylesheet" href="/style.css" />
+  <title>Dis-le-pour-moi</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <h2>Un espace simple pour parler, réfléchir et avancer.</h2>
+<h2>Un espace simple pour parler</h2>
 
-  <div id="language-switch">
-    <button id="btn-fr">🇫🇷 Français</button>
-    <button id="btn-kr">🇭🇹 Kreyòl</button>
-  </div>
+<div id="chat"></div>
 
-  <div id="chat"></div>
+<form id="form">
+  <input id="message" placeholder="Écris ici..." />
+  <button type="submit">Envoyer</button>
+  <button type="button" id="reset">Reset</button>
+</form>
 
-  <form id="chat-form">
-    <input id="message" placeholder="Écris ici..." />
-    <button type="submit" id="send">Envoyer</button>
-    <button type="button" id="reset">Reset</button>
-  </form>
-
-  <script src="/script.js"></script>
+<script src="./script.js"></script>
 </body>
 </html>
