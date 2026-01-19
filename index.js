@@ -10,16 +10,18 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// 🔥 OBLIGATOIRE POUR LE NAVIGATEUR
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// === TEST ROUTE ===
+// ================== ROUTES AVANT STATIC ==================
+
+// TEST
 app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-// === CHAT ROUTE ===
+// CHAT
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
@@ -41,5 +43,16 @@ app.post("/chat", async (req, res) => {
       reply: completion.choices[0].message.content,
     });
   } catch (err) {
-    console.error("❌ CHAT ERROR:", err);
-    res.status(500).json({ reply: "Err
+    console.error("❌ ERREUR CHAT:", err);
+    res.status(500).json({ reply: "Erreur IA" });
+  }
+});
+
+// ================== STATIC APRÈS ==================
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, "public")));
+
+app.listen(PORT, () => {
+  console.log("🔥 EXPRESS SERVER STARTED on port", PORT);
+});

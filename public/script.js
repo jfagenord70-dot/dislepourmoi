@@ -31,6 +31,6 @@ chatForm.addEventListener("submit", async (e) => {
     addMessage(data.reply, "ai");
   } catch (err) {
     console.error(err);
-    addMessage("❌ Erreur de connexion", "ai");
+    addMessage("❌ Erreur serveur", "ai");
   }
 });
