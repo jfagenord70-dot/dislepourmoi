@@ -4,21 +4,18 @@ require("dotenv").config();
 
 const app = express();
 
-// MIDDLEWARES
+// JSON middleware
 app.use(express.json());
-app.use(express.static("public"));
 
-// TEST ROUTE (IMPORTANT)
+// ROUTES AVANT static 👈👈👈
 app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-// OPENAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// CHAT ROUTE
 app.post("/chat", async (req, res) => {
   try {
     console.log("BODY:", req.body);
@@ -38,12 +35,14 @@ app.post("/chat", async (req, res) => {
 
     res.json({ reply });
   } catch (err) {
-    console.error("ERREUR:", err);
+    console.error("ERREUR IA:", err);
     res.status(500).json({ reply: "Erreur IA" });
   }
 });
 
-// PORT
+// STATIC EN DERNIER 👈
+app.use(express.static("public"));
+
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("SERVER OK on port", PORT);
