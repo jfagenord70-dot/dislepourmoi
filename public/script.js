@@ -1,39 +1,39 @@
-const chatForm = document.getElementById("chat-form");
-const messageInput = document.getElementById("message");
-const chatDiv = document.getElementById("chat");
+// ====== RÉFÉRENCES ======
+const form = document.getElementById("form");
+const input = document.getElementById("message");
+const responseBox = document.getElementById("response");
 
-function addMessage(text, sender) {
-  const div = document.createElement("div");
-  div.textContent = `${sender === "user" ? "Toi" : "IA"} : ${text}`;
-  chatDiv.appendChild(div);
-  chatDiv.scrollTop = chatDiv.scrollHeight;
-}
+// ⚠️ METS URL BACKEND LA ICI (ABSOLUE)
+const API_URL = "https://TON-BACKEND.onrender.com/api/chat";
 
-chatForm.addEventListener("submit", async (e) => {
+// ====== SUBMIT FORM ======
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const text = messageInput.value.trim();
-  if (!text) return;
+  const userMessage = input.value.trim();
 
-  addMessage(text, "user");
-  messageInput.value = "";
+  if (!userMessage) {
+    alert("Antre yon mesaj dabò");
+    return;
+  }
+
+  // Affiche message utilisateur
+  responseBox.innerHTML = "⏳ Ap voye mesaj la...";
+  input.value = "";
 
   try {
-    const res = await fetch(
-      "https://dislepourmoi-backend.onrender.com/chat",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: text }),
-      }
-    );
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: userMessage,
+      }),
+    });
 
-    const data = await res.json();
-    addMessage(data.reply, "ai");
-  } catch (err) {
-    console.error(err);
-    addMessage("❌ Erreur serveur", "ai");
-  }
-});
+    if (!res.ok) {
+      throw new Error("Erreur serveur");
+    }
+
+    const
